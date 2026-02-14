@@ -1,0 +1,209 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_MYSQL",
+      "label": "MySQL",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "mysql",
+      "pluginName": "MySQL"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "barchart",
+      "name": "Bar chart",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.3.2+security-01"
+    },
+    {
+      "type": "datasource",
+      "id": "mysql",
+      "name": "MySQL",
+      "version": "12.3.2"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "${DS_MYSQL}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 22,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "normal",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 30,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.3.2+security-01",
+      "targets": [
+        {
+          "dataset": "alliance_auth",
+          "datasource": {
+            "type": "mysql",
+            "uid": "${DS_MYSQL}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH corp_payouts_summarized AS (\n    SELECT \n        cje.second_party_id AS character_id,\n        cje.ref_type,\n        SUM(cje.amount) AS total_amount\n    FROM alliance_auth.corptools_corporationwalletjournalentry cje\n    INNER JOIN alliance_auth.corptools_corporationwalletdivision cwd ON cje.division_id = cwd.id\n    INNER JOIN alliance_auth.corptools_corporationaudit ca ON cwd.corporation_id = ca.id\n    INNER JOIN alliance_auth.eveonline_evecorporationinfo ci ON ca.corporation_id = ci.id\n    WHERE $__timeFilter(cje.date)\n        AND cje.ref_type IN ('corporate_reward_payout')\n        AND ci.corporation_id IN ($corporation)\n    GROUP BY cje.second_party_id, cje.ref_type\n),\nchar_journal_summarized AS (\n    -- Standard Tax column entries\n    SELECT \n        second_party_id AS character_id,\n        ref_type,\n        SUM(tax) AS total_amount\n    FROM alliance_auth.corptools_characterwalletjournalentry\n    WHERE $__timeFilter(date)\n        AND tax > 0\n        AND tax_receiver_id IN ($corporation)\n    GROUP BY character_id, ref_type\n),\nchar_direct_tax_summarized AS (\n    -- Entries where 'amount' is the tax (e.g. PI, Reprocessing)\n    -- Using first_party_id because the character is paying OUT to the corp\n    SELECT \n        first_party_id AS character_id,\n        ref_type,\n        SUM(ABS(amount)) AS total_amount\n    FROM alliance_auth.corptools_characterwalletjournalentry\n    WHERE $__timeFilter(date)\n        AND ref_type IN ('planetary_import_tax', 'planetary_export_tax', 'reprocessing_tax', 'brokers_fee', 'industry_job_tax', 'project_discovery_tax')\n        AND second_party_id IN ($corporation)\n    GROUP BY first_party_id, ref_type\n),\ncombined_data AS (\n    SELECT\n        main.id AS main_id,\n        main.character_name,\n        entry.ref_type,\n        entry.total_amount\n    FROM (\n        SELECT character_id, ref_type, total_amount FROM char_journal_summarized\n        UNION ALL\n        SELECT character_id, ref_type, total_amount FROM corp_payouts_summarized\n        UNION ALL\n        SELECT character_id, ref_type, total_amount FROM char_direct_tax_summarized\n    ) entry\n    INNER JOIN alliance_auth.eveonline_evecharacter ec ON entry.character_id = ec.character_id\n    INNER JOIN alliance_auth.authentication_characterownership own ON ec.id = own.character_id\n    INNER JOIN alliance_auth.authentication_userprofile up ON own.user_id = up.user_id\n    INNER JOIN alliance_auth.eveonline_evecharacter main ON up.main_character_id = main.id\n),\ntop_characters AS (\n    SELECT\n        main_id,\n        SUM(total_amount) AS character_total\n    FROM combined_data\n    GROUP BY main_id\n    ORDER BY character_total DESC\n    LIMIT 20\n)\nSELECT\n    cd.character_name,\n    cd.ref_type,\n    SUM(cd.total_amount) AS total_sum\nFROM combined_data cd\nINNER JOIN top_characters tc ON cd.main_id = tc.main_id\nGROUP BY\n    cd.main_id,\n    cd.character_name,\n    cd.ref_type,\n    tc.character_total\nORDER BY tc.character_total DESC, total_sum DESC",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Estimated Tax Paid",
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "ref_type",
+            "rowField": "character_name",
+            "valueField": "total_sum"
+          }
+        }
+      ],
+      "type": "barchart"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "mysql",
+          "uid": "${DS_MYSQL}"
+        },
+        "definition": "SELECT corporation_name as __text, corporation_id as __value FROM eveonline_evecorporationinfo;",
+        "includeAll": true,
+        "label": "Receiver Corporation",
+        "multi": true,
+        "name": "corporation",
+        "options": [],
+        "query": "SELECT corporation_name as __text, corporation_id as __value FROM eveonline_evecorporationinfo;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Taxes",
+  "uid": "ddfd26gxydh3b4b",
+  "version": 2,
+  "weekStart": ""
+}

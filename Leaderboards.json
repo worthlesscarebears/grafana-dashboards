@@ -1,0 +1,427 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_MYSQL",
+      "label": "MySQL",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "mysql",
+      "pluginName": "MySQL"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "barchart",
+      "name": "Bar chart",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.3.2+security-01"
+    },
+    {
+      "type": "datasource",
+      "id": "mysql",
+      "name": "MySQL",
+      "version": "12.3.2"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "${DS_MYSQL}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 30,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.3.2+security-01",
+      "targets": [
+        {
+          "dataset": "alliance_auth",
+          "datasource": {
+            "type": "mysql",
+            "uid": "${DS_MYSQL}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\n    main.character_name,\n    SUM(char_totals.char_sum) AS total_sum\nFROM (\n    SELECT\n        character_id,\n        SUM(amount) AS char_sum\n    FROM alliance_auth.corptools_characterwalletjournalentry\n    WHERE ref_type = \"bounty_prizes\"\n        AND $__timeFilter(date)\n    GROUP BY character_id\n) AS char_totals\nINNER JOIN alliance_auth.corptools_characteraudit as ca\n    ON ca.id = char_totals.character_id\nINNER JOIN alliance_auth.authentication_characterownership AS own \n    ON ca.character_id = own.character_id\nINNER JOIN alliance_auth.authentication_userprofile AS up \n    ON own.user_id = up.user_id\nINNER JOIN alliance_auth.eveonline_evecharacter AS main \n    ON up.main_character_id = main.id\nWHERE\n  main.corporation_name = \"$corporation\"\nGROUP BY\n    main.id\nORDER BY total_sum desc\nLIMIT 20;",
+          "refId": "C",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Ratting",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "${DS_MYSQL}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 12
+      },
+      "id": 3,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "never",
+        "stacking": "normal",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 30,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.3.2+security-01",
+      "targets": [
+        {
+          "dataset": "alliance_auth",
+          "datasource": {
+            "type": "mysql",
+            "uid": "${DS_MYSQL}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH top_miners AS (\n    SELECT\n        up.main_character_id,\n        SUM(ledger.quantity) AS grand_total\n    FROM alliance_auth.corptools_characterminingledger AS ledger\n    INNER JOIN alliance_auth.corptools_characteraudit AS ca \n        ON ca.id = ledger.character_id\n    INNER JOIN alliance_auth.authentication_characterownership AS own \n        ON ca.character_id = own.character_id\n    INNER JOIN alliance_auth.authentication_userprofile AS up \n        ON own.user_id = up.user_id\n    INNER JOIN alliance_auth.eveonline_evecharacter AS main \n        ON up.main_character_id = main.id\n    WHERE $__timeFilter(ledger.date)\n      AND main.corporation_name = \"$corporation\"\n    GROUP BY up.main_character_id\n    ORDER BY grand_total DESC\n    LIMIT 20\n)\nSELECT\n    main.character_name,\n    ig.name,\n    SUM(ledger.quantity) AS total_sum,\n    tm.grand_total\nFROM alliance_auth.corptools_characterminingledger AS ledger\nINNER JOIN alliance_auth.corptools_eveitemtype AS it \n    ON it.type_id = ledger.type_name_id\nINNER JOIN alliance_auth.corptools_eveitemgroup AS ig \n    ON ig.group_id = it.group_id\nINNER JOIN alliance_auth.corptools_characteraudit AS ca \n    ON ca.id = ledger.character_id\nINNER JOIN alliance_auth.authentication_characterownership AS own \n    ON ca.character_id = own.character_id\nINNER JOIN alliance_auth.authentication_userprofile AS up \n    ON own.user_id = up.user_id\nINNER JOIN alliance_auth.eveonline_evecharacter AS main \n    ON up.main_character_id = main.id\nINNER JOIN top_miners AS tm\n    ON main.id = tm.main_character_id\nWHERE $__timeFilter(ledger.date)\nGROUP BY main.id, ig.group_id, tm.grand_total\nORDER BY tm.grand_total DESC, total_sum DESC",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Mining",
+      "transformations": [
+        {
+          "id": "groupingToMatrix",
+          "options": {
+            "columnField": "name",
+            "rowField": "character_name",
+            "valueField": "total_sum"
+          }
+        }
+      ],
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "${DS_MYSQL}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 13,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 2,
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.97,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "orientation": "auto",
+        "showValue": "auto",
+        "stacking": "none",
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 30,
+        "xTickLabelSpacing": 0
+      },
+      "pluginVersion": "12.3.2+security-01",
+      "targets": [
+        {
+          "dataset": "alliance_auth",
+          "datasource": {
+            "type": "mysql",
+            "uid": "${DS_MYSQL}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT\n    main.character_name,\n    SUM(char_totals.char_sum) AS total_sum\nFROM (\n    SELECT\n        installer_id,\n        COUNT(*) AS char_sum\n    FROM alliance_auth.corptools_corporationindustryjob\n    WHERE\n      $__timeFilter(start_date)\n    GROUP BY installer_id\n) AS char_totals\nINNER JOIN alliance_auth.eveonline_evecharacter as c\n    ON c.character_id = char_totals.installer_id\nINNER JOIN alliance_auth.authentication_characterownership AS own \n    ON c.id = own.character_id\nINNER JOIN alliance_auth.authentication_userprofile AS up \n    ON own.user_id = up.user_id\nINNER JOIN alliance_auth.eveonline_evecharacter AS main \n    ON up.main_character_id = main.id\nWHERE\n  main.corporation_name = \"$corporation\"\nGROUP BY\n    main.id\nORDER BY total_sum desc\nLIMIT 20;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Corp Jobs Installed",
+      "type": "barchart"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "mysql",
+          "uid": "${DS_MYSQL}"
+        },
+        "definition": "SELECT corporation_name from eveonline_evecorporationinfo;",
+        "description": "",
+        "label": "Main Corporation",
+        "name": "corporation",
+        "options": [],
+        "query": "SELECT corporation_name from eveonline_evecorporationinfo;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Leaderboards",
+  "uid": "wcb22jh",
+  "version": 3,
+  "weekStart": ""
+}

@@ -1,0 +1,241 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_MYSQL",
+      "label": "MySQL",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "mysql",
+      "pluginName": "MySQL"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "12.3.2+security-01"
+    },
+    {
+      "type": "datasource",
+      "id": "mysql",
+      "name": "MySQL",
+      "version": "12.3.2"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "${DS_MYSQL}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "footer": {
+              "reducers": []
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 360
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 36,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "frameIndex": 1,
+        "showHeader": true
+      },
+      "pluginVersion": "12.3.2+security-01",
+      "targets": [
+        {
+          "dataset": "alliance_auth",
+          "datasource": {
+            "type": "mysql",
+            "uid": "${DS_MYSQL}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \n  item.name as item,\n  owner.character_name as owner,\n  item_group.name as item_group,\n  sys.name as system,\n  main.character_name as main,\n  location.location_name as location,\n  casset.name as asset_name\nFROM alliance_auth.corptools_characterasset as casset\nJOIN corptools_eveitemtype as item\n  ON item.type_id = casset.type_id\nJOIN corptools_eveitemgroup as item_group\n  ON item_group.group_id =  item.group_id\nJOIN corptools_evelocation as location\n  ON location.location_id = casset.location_id\nJOIN corptools_mapsystem as sys\n  ON sys.system_id = location.system_id\nJOIN corptools_characteraudit as caudit\n  ON caudit.id = casset.character_id\nJOIN eveonline_evecharacter as owner\n  ON owner.id = caudit.character_id\nJOIN alliance_auth.authentication_characterownership AS own \n  ON caudit.character_id = own.character_id\nJOIN alliance_auth.authentication_userprofile AS up \n  ON own.user_id = up.user_id\nJOIN alliance_auth.eveonline_evecharacter AS main \n  ON up.main_character_id = main.id\nWHERE \n  location_flag = \"Hangar\"\n  and casset.type_id in ($item_type)\n  and sys.system_id in ($system)\n  and item_group.group_id in ($item_group)\n  and main.corporation_name in ($corporation)\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Assets",
+      "type": "table"
+    }
+  ],
+  "preload": false,
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "mysql",
+          "uid": "${DS_MYSQL}"
+        },
+        "definition": "SELECT corporation_name from eveonline_evecorporationinfo;",
+        "description": "",
+        "includeAll": true,
+        "label": "Main Corporation",
+        "multi": true,
+        "name": "corporation",
+        "options": [],
+        "query": "SELECT corporation_name from eveonline_evecorporationinfo;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "mysql",
+          "uid": "${DS_MYSQL}"
+        },
+        "definition": "SELECT system_id as __value, name as __text FROM corptools_mapsystem;",
+        "includeAll": true,
+        "label": "System",
+        "multi": true,
+        "name": "system",
+        "options": [],
+        "query": "SELECT system_id as __value, name as __text FROM corptools_mapsystem;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "mysql",
+          "uid": "${DS_MYSQL}"
+        },
+        "definition": "SELECT name as __text, type_id as __value FROM corptools_eveitemtype;",
+        "description": "",
+        "includeAll": true,
+        "label": "Item Type",
+        "multi": true,
+        "name": "item_type",
+        "options": [],
+        "query": "SELECT name as __text, type_id as __value FROM corptools_eveitemtype;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "mysql",
+          "uid": "${DS_MYSQL}"
+        },
+        "definition": "SELECT name as __text,  group_id as __value FROM corptools_eveitemgroup;",
+        "description": "",
+        "includeAll": true,
+        "label": "Item Group",
+        "multi": true,
+        "name": "item_group",
+        "options": [],
+        "query": "SELECT name as __text,  group_id as __value FROM corptools_eveitemgroup;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Assets",
+  "uid": "wcz52qw",
+  "version": 6,
+  "weekStart": ""
+}
