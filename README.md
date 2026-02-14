@@ -1,9 +1,19 @@
 # grafana-dashboards
 
-Dashboards for grafana for alliance auth. Reliant on the corptools ecosystem
-for data.
+Dashboards for grafana for alliance auth.
 
-Send your generously sized isk donations to `Orange Drangon Aideron`. Best of
-luck. 
+Send your generously sized isk donations to `Orange Drangon Aideron`.
 
 File PRs if you have issues.
+
+## Dependencies
+
+- corptools
+
+## Examples
+
+![assets.avif](./assets/assets.avif)
+![character lookup.avif](./assets/character%20lookup.avif)
+![corp wallet.avif](./assets/corp%20wallet.avif)
+![leaderboards.avif](./assets/leaderboards.avif)
+![taxes.avif](./assets/taxes.avif)
