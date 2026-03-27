@@ -15,13 +15,19 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "12.3.2+security-01"
+      "version": "12.4.2"
     },
     {
       "type": "datasource",
       "id": "mysql",
       "name": "MySQL",
-      "version": "12.3.2"
+      "version": "12.4.2"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
     },
     {
       "type": "panel",
@@ -49,9 +55,249 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
-  "links": [],
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Source (GitHub)",
+      "tooltip": "View source file in repository",
+      "type": "link",
+      "url": "https://github.com/worthlesscarebears/wcbr-dashboards/blob/main/grafana/assets.json"
+    }
+  ],
   "panels": [
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "panels": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 24,
+            "x": 0,
+            "y": 1
+          },
+          "id": 2,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "count"
+              ],
+              "fields": "/^item \\(count\\)$/",
+              "values": true
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.4.2",
+          "targets": [
+            {
+              "datasource": {
+                "type": "datasource",
+                "uid": "-- Dashboard --"
+              },
+              "panelId": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Count of Matches",
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "item": {
+                    "aggregations": [
+                      "count"
+                    ],
+                    "operation": "groupby"
+                  }
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "item (count)"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "limit",
+              "options": {
+                "limitField": "15"
+              }
+            }
+          ],
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": 0
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 3,
+            "w": 24,
+            "x": 0,
+            "y": 4
+          },
+          "id": 3,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "percentChangeColorMode": "standard",
+            "reduceOptions": {
+              "calcs": [
+                "firstNotNull"
+              ],
+              "fields": "",
+              "values": true
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "12.4.2",
+          "targets": [
+            {
+              "adHocFiltersEnabled": false,
+              "datasource": {
+                "type": "datasource",
+                "uid": "-- Dashboard --"
+              },
+              "panelId": 1,
+              "refId": "A"
+            }
+          ],
+          "title": "Top Owners",
+          "transformations": [
+            {
+              "id": "groupBy",
+              "options": {
+                "fields": {
+                  "item": {
+                    "aggregations": [],
+                    "operation": "aggregate"
+                  },
+                  "main": {
+                    "aggregations": [
+                      "count"
+                    ],
+                    "operation": "groupby"
+                  }
+                }
+              }
+            },
+            {
+              "id": "sortBy",
+              "options": {
+                "fields": {},
+                "sort": [
+                  {
+                    "desc": true,
+                    "field": "main (count)"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "limit",
+              "options": {
+                "limitField": "15"
+              }
+            }
+          ],
+          "type": "stat"
+        }
+      ],
+      "title": "Fun Stats",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      },
+      "id": 5,
+      "panels": [],
+      "title": "Main",
+      "type": "row"
+    },
     {
       "datasource": {
         "type": "mysql",
@@ -103,18 +349,24 @@
         ]
       },
       "gridPos": {
-        "h": 36,
+        "h": 21,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 2
       },
       "id": 1,
       "options": {
         "cellHeight": "sm",
-        "frameIndex": 1,
-        "showHeader": true
+        "frameIndex": 0,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "main"
+          }
+        ]
       },
-      "pluginVersion": "12.3.2+security-01",
+      "pluginVersion": "12.4.2",
       "targets": [
         {
           "dataset": "alliance_auth",
@@ -125,7 +377,7 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT \n  item.name as item,\n  owner.character_name as owner,\n  item_group.name as item_group,\n  sys.name as system,\n  main.character_name as main,\n  location.location_name as location,\n  casset.name as asset_name\nFROM alliance_auth.corptools_characterasset as casset\nJOIN corptools_eveitemtype as item\n  ON item.type_id = casset.type_id\nJOIN corptools_eveitemgroup as item_group\n  ON item_group.group_id =  item.group_id\nJOIN corptools_evelocation as location\n  ON location.location_id = casset.location_id\nJOIN corptools_mapsystem as sys\n  ON sys.system_id = location.system_id\nJOIN corptools_characteraudit as caudit\n  ON caudit.id = casset.character_id\nJOIN eveonline_evecharacter as owner\n  ON owner.id = caudit.character_id\nJOIN alliance_auth.authentication_characterownership AS own \n  ON caudit.character_id = own.character_id\nJOIN alliance_auth.authentication_userprofile AS up \n  ON own.user_id = up.user_id\nJOIN alliance_auth.eveonline_evecharacter AS main \n  ON up.main_character_id = main.id\nWHERE \n  location_flag = \"Hangar\"\n  and casset.type_id in ($item_type)\n  and sys.system_id in ($system)\n  and item_group.group_id in ($item_group)\n  and main.corporation_name in ($corporation)\n",
+          "rawSql": "WITH filtered_main_chars AS (\n    -- Pre-calculate and filter character ownership links\n    SELECT \n        caudit.id AS audit_id,\n        owner.character_name AS owner_name,\n        main.character_name AS main_name\n    FROM alliance_auth.corptools_characteraudit AS caudit\n    JOIN alliance_auth.eveonline_evecharacter AS owner ON owner.id = caudit.character_id\n    JOIN alliance_auth.authentication_characterownership AS own ON caudit.character_id = own.character_id\n    JOIN alliance_auth.authentication_userprofile AS up ON own.user_id = up.user_id\n    JOIN alliance_auth.eveonline_evecharacter AS main ON up.main_character_id = main.id\n    WHERE main.corporation_id IN ($corporation)\n),\nfiltered_locations AS (\n    -- Resolve systems and locations in one pass\n    SELECT \n        loc.location_id,\n        loc.location_name,\n        sys.name AS system_name\n    FROM alliance_auth.corptools_evelocation AS loc\n    JOIN alliance_auth.eve_sde_solarsystem AS sys ON sys.id = loc.system_id\n    WHERE sys.id IN ($system)\n),\nfiltered_items AS (\n    -- Isolate specific item types and groups\n    SELECT \n        item.id as type_id,\n        item.name AS item_name,\n        grp.name AS group_name\n    FROM alliance_auth.eve_sde_itemtype AS item\n    JOIN alliance_auth.eve_sde_itemgroup AS grp ON item.group_id = grp.id\n    WHERE item.id IN ($item_type)\n      AND item.group_id IN ($item_group)\n)\nSELECT \n    i.item_name AS item,\n    m.owner_name AS owner,\n    i.group_name AS item_group,\n    l.system_name AS system,\n    m.main_name AS main,\n    l.location_name AS location,\n    casset.name AS asset_name\nFROM alliance_auth.corptools_characterasset AS casset\nINNER JOIN filtered_main_chars m ON casset.character_id = m.audit_id\nINNER JOIN filtered_locations l ON casset.location_id = l.location_id\nINNER JOIN filtered_items i ON casset.type_name_id = i.type_id\nWHERE casset.location_flag = 'Hangar';\n",
           "refId": "A",
           "sql": {
             "columns": [
@@ -161,16 +413,45 @@
           "type": "mysql",
           "uid": "${DS_MYSQL}"
         },
-        "definition": "SELECT corporation_name from eveonline_evecorporationinfo;",
+        "definition": "SELECT corporation_id, corporation_name from eveonline_evecorporationinfo;",
         "description": "",
         "includeAll": true,
         "label": "Main Corporation",
         "multi": true,
         "name": "corporation",
         "options": [],
-        "query": "SELECT corporation_name from eveonline_evecorporationinfo;",
+        "query": {
+          "editorMode": "code",
+          "format": "table",
+          "meta": {
+            "textField": "corporation_name",
+            "valueField": "corporation_id"
+          },
+          "query": "SELECT corporation_id, corporation_name from eveonline_evecorporationinfo;",
+          "rawQuery": true,
+          "rawSql": "SELECT corporation_id, corporation_name from eveonline_evecorporationinfo;",
+          "refId": "SQLVariableQueryEditor-VariableQuery",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
         "refresh": 1,
         "regex": "",
+        "regexApplyTo": "value",
         "type": "query"
       },
       {
@@ -179,15 +460,44 @@
           "type": "mysql",
           "uid": "${DS_MYSQL}"
         },
-        "definition": "SELECT system_id as __value, name as __text FROM corptools_mapsystem;",
+        "definition": "SELECT id, name FROM eve_sde_solarsystem;",
         "includeAll": true,
         "label": "System",
         "multi": true,
         "name": "system",
         "options": [],
-        "query": "SELECT system_id as __value, name as __text FROM corptools_mapsystem;",
+        "query": {
+          "editorMode": "code",
+          "format": "table",
+          "meta": {
+            "textField": "name",
+            "valueField": "id"
+          },
+          "query": "SELECT id, name FROM eve_sde_solarsystem;",
+          "rawQuery": true,
+          "rawSql": "SELECT id, name FROM eve_sde_solarsystem;",
+          "refId": "SQLVariableQueryEditor-VariableQuery",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
         "refresh": 1,
         "regex": "",
+        "regexApplyTo": "value",
         "type": "query"
       },
       {
@@ -196,16 +506,45 @@
           "type": "mysql",
           "uid": "${DS_MYSQL}"
         },
-        "definition": "SELECT name as __text, type_id as __value FROM corptools_eveitemtype;",
+        "definition": "SELECT id, name FROM eve_sde_itemtype;",
         "description": "",
         "includeAll": true,
         "label": "Item Type",
         "multi": true,
         "name": "item_type",
         "options": [],
-        "query": "SELECT name as __text, type_id as __value FROM corptools_eveitemtype;",
+        "query": {
+          "editorMode": "code",
+          "format": "table",
+          "meta": {
+            "textField": "name",
+            "valueField": "id"
+          },
+          "query": "SELECT id, name FROM eve_sde_itemtype;",
+          "rawQuery": true,
+          "rawSql": "SELECT id, name FROM eve_sde_itemtype;",
+          "refId": "SQLVariableQueryEditor-VariableQuery",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
         "refresh": 1,
         "regex": "",
+        "regexApplyTo": "value",
         "type": "query"
       },
       {
@@ -214,16 +553,45 @@
           "type": "mysql",
           "uid": "${DS_MYSQL}"
         },
-        "definition": "SELECT name as __text,  group_id as __value FROM corptools_eveitemgroup;",
+        "definition": "SELECT id, name FROM eve_sde_itemgroup;",
         "description": "",
         "includeAll": true,
-        "label": "Item Group",
+        "label": "item_group",
         "multi": true,
         "name": "item_group",
         "options": [],
-        "query": "SELECT name as __text,  group_id as __value FROM corptools_eveitemgroup;",
+        "query": {
+          "editorMode": "code",
+          "format": "table",
+          "meta": {
+            "textField": "name",
+            "valueField": "id"
+          },
+          "query": "SELECT id, name FROM eve_sde_itemgroup;",
+          "rawQuery": true,
+          "rawSql": "SELECT id, name FROM eve_sde_itemgroup;",
+          "refId": "SQLVariableQueryEditor-VariableQuery",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
         "refresh": 1,
         "regex": "",
+        "regexApplyTo": "value",
         "type": "query"
       }
     ]
@@ -236,6 +604,6 @@
   "timezone": "browser",
   "title": "Assets",
   "uid": "wcz52qw",
-  "version": 6,
+  "version": 26,
   "weekStart": ""
 }
