@@ -9,6 +9,7 @@ File PRs if you have issues.
 ## Dependencies
 
 - corptools
+- buybackprogram (for Buyback Program Statistics)
 
 ## Examples
 
